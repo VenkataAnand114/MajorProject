@@ -9,9 +9,10 @@ import cv2
 from gaze_tracking import GazeTracking
 from evaluate_sheet import _process_sheet
 
+
 gaze = GazeTracking()
 webcam = cv2.VideoCapture(0)
-TT = 600  #number of secs it is going to run
+TT = 600  #number of frames it is going to run
 wb = xlwt.Workbook()
 sheet = wb.add_sheet('hrvr_table')
 c0 = 0

@@ -30,7 +30,7 @@ def _process_sheet():
     #lists are ready
     #print(hr)
     #print(vr)
-    wb = xls.Workbook('hrvr_table.xls',{'nan_inf_to_errors': True})
+    wb = xls.Workbook('hrvr_table_processed.xls',{'nan_inf_to_errors': True})
     sheet = wb.add_worksheet('hrvr_table')
     frames = 1
     average_hr = 0
@@ -40,7 +40,7 @@ def _process_sheet():
     nan_s = 0
     for i in range(len(hr)):
         if(frames == standard_frames ):
-            if(nan_s > 60): # more than 1/2 of time was spent undetected, so deem the frame unecessary
+            if(nan_s > 40): # more than 1/3 of time was spent undetected, so deem the frame unecessary
                 sheet.write(row_counter,c3,-1)
                 sheet.write(row_counter,c4,-1)
             else:
@@ -62,11 +62,11 @@ def _process_sheet():
         else:
             sum_hr = sum_hr + hr[i]
             sum_vr = sum_vr + vr[i]
-            print("sum_hr=",sum_hr)
-            print("sum_vr=",sum_vr)
+            #print("sum_hr=",sum_hr)
+            #print("sum_vr=",sum_vr)
         frames = frames + 1
     #log the rest of the data after the loop ends, might have less than 120 frames captured
-    if(frames > 20):
+    if(frames > 40):
         average_hr = sum_hr / (frames - (nan_s)) 
         average_vr = sum_hr / (frames - (nan_s)) 
         sheet.write(row_counter,c3,average_hr)
