@@ -1,0 +1,6 @@
+numpy
+cmake
+opencv_python
+dlib
+xlsxwriter
+
