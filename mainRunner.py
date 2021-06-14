@@ -1,13 +1,15 @@
+#all imports 
 from keras.models import load_model
 from time import sleep
 from keras.preprocessing.image import img_to_array
 from keras.preprocessing import image
 import cv2
 import numpy as np
-from gaze_tracking import GazeTracking
+from GazeTracking.gaze_tracking import GazeTracking
 import xlsxwriter     
 import time      
 
+#function to return the mapping for label to the values of the emotions
 def get_number(label):
     if(label=="Angry"):
         return 0.86
@@ -24,79 +26,74 @@ def get_number(label):
     elif(label =="Neutral"):
         return  -0.82
 
+webcam = cv2.VideoCapture(0) #open the camera
 
+gaze = GazeTracking() #gaze tracking object
+cascade_classifier=cv2.CascadeClassifier(r'C:\Users\Anand\Desktop\MajorProject\EmotionRecognition\frontalface.xml') #model to search for face in an image
+model=load_model(r'C:\Users\Anand\Desktop\MajorProject\EmotionRecognition\face.hdf5') #emotion detection model
+class_labels=['Angry','Disgust','Fear','Happy','Neutral','Sad','Surprise'] #classes of the emotions
 
-book = xlsxwriter.Workbook('Example3.xlsx')     
-sheet = book.add_worksheet()
-
-gaze = GazeTracking()
-webcam = cv2.VideoCapture(0)
-cascade_classifier=cv2.CascadeClassifier(r'..\images\haarcascade_frontalface_default.xml')
-model=load_model(r'C:..\images\face.hdf5')
-class_labels=['Angry','Disgust','Fear','Happy','Neutral','Sad','Surprise']
+#create an excel sheet to write write data
+book = xlsxwriter.Workbook('C:\Users\Anand\Desktop\MajorProject\Data\sheets\data.xlsx')     
+sheet = book.add_worksheet('data')
 row = 0    
-column = 0       
+column = 0   
+
+#Time information variables
+TT = 12 #runs for 1200 frames
+sleep_time = 0.499 #sleeps for 0.499 ~ 0.5 secs, so runs at 2fps
 t=0
-# iterating through the content list
-t1=time.time()
+
 i=0
-while True:
+while (TT > 0):
     _, frame = webcam.read()
-    labels = []
-    gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-    faces = cascade_classifier.detectMultiScale(gray,1.3,5)
+    labels = [] #labels initialized as an empty list 
+
+    gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY) # gray scale the image
+    faces = cascade_classifier.detectMultiScale(gray,1.3,5) #detect the faces
+
+    #for each face detected in the image
     for (x,y,w,h) in faces:
-        cv2.rectangle(frame,(x,y),(x+w,y+h),(0,0,0),2)
-        roi_gray = gray[y:y+h,x:x+w]
-        roi_gray = cv2.resize(roi_gray,(48,48),fx=100,fy=100,interpolation=cv2.INTER_CUBIC)
-        crop = frame[y:y+h,x:x+w]
-        if np.sum([roi_gray])!=0:
+
+        cv2.rectangle(frame,(x,y),(x+w,y+h),(0,0,0),2) #put a rectagle on the face
+        roi_gray = gray[y:y+h,x:x+w] #cut out the face in gray
+        roi_gray = cv2.resize(roi_gray,(48,48),fx=100,fy=100,interpolation=cv2.INTER_CUBIC) #resize the face
+        crop = frame[y:y+h,x:x+w] #save the face in color formate
+
+        if np.sum([roi_gray])!=0: #is face is present, and the image is not all dark
+            
+            #EMotion Detection part
             roi = roi_gray.astype('float')/255.0
             roi = img_to_array(roi)
             roi = np.expand_dims(roi,axis=0)
-            preds = model.predict(roi)[0]
-            label=class_labels[preds.argmax()]
-            label_position = (x,y)
-            cv2.putText(frame,label,label_position,cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,255),3)
-            gaze.refresh(frame)
-            frame = gaze.annotated_frame()
-            text =""
-            r_cor=gaze.is_right()
-            l_cor=gaze.is_left()
+
+            preds = model.predict(roi)[0] #do the prediction
+            label=class_labels[preds.argmax()] #get the label
+            label_position = (x,y)  #make a tuple of the coordinates where the face begins
+            cv2.putText(frame,label,label_position,cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,255),3) #print stuff on the frame
+
+            #Gaze Tracking part
+            gaze.refresh(frame) #give the source image to the gaze tracking object
+            #frame = gaze.annotated_frame() #set the markings on the pupils
+            hr=gaze.horizontal_ratio()
+            vr=gaze.vertical_ratio()
             label_position = (x-2,y-50)
-            if(t==0):
-                t2=time.time()
-            time.sleep(1)
-            t3=time.time()
-            t=t3-t2
-            t4=t3-t1
-            print(t)
             label = get_number(label)
-            l=[]
-           # if t>5:     
-            t=0
-            print("12345")
-            l.append(text)
-            l.append(l_cor)
-            l.append(gaze.vertical())
+            l=[]  
+            l.append(hr)
+            l.append(vr)
             l.append(preds.argmax())
             for x in l:
                 print()
                 sheet.write(row, column, x)
                 column+=1
-            #sheet.insert_image(row,column,roi_gray) 
             row += 1
             column=0
-            cv2.putText(frame, text,label_position,cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,255),3)
-            left_pupil = gaze.pupil_left_coords()
-            right_pupil = gaze.pupil_right_coords()
-            cv2.putText(frame, "Left pupil:  " + str(left_pupil), (90, 130), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
-            cv2.putText(frame, "Right pupil: " + str(right_pupil), (90, 165), cv2.FONT_HERSHEY_DUPLEX, 0.9, (147, 58, 31), 1)
-
             cv2.imshow("Demo", frame)
-            cv2.imwrite('kang'+str(i)+'.jpg',crop)
+            cv2.imwrite('C:\Users\Anand\Desktop\MajorProject\Data\Images\kang'+str(i)+'.jpg',crop)
             sheet.insert_image(row,column,'kang'+str(i)+'.jpg')            
             i+=1
-    if cv2.waitKey(1) == 27:
-        book.close()
         break
+    time.sleep(sleep_time) #sleeps till the amount of time specified in 'sleep_time' variable
+    TT = TT -1 #reduce the number of frames captured
+book.close()
