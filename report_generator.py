@@ -2,9 +2,10 @@ import pandas as pd
 import numpy as np
 import xlsxwriter as xls
 import math
+import matplotlib.pyplot as plt
 
 def _process_sheet():
-    standard_frames = 120
+    standard_frames = 10
     #column numbers
     c0 = 0
     c1 = 1
@@ -17,20 +18,39 @@ def _process_sheet():
     sheet = None
     hr = []
     vr = []
+    y_axis = [0,0,0,0,0,0,0]
+    x_axis = [0,1,2,3,4,5,6]
 
     #read the excel sheet as a data frame
-    with pd.ExcelFile("hrvr_table.xls") as reader:
-        sheet = pd.read_excel(reader, sheet_name = 'hrvr_table')
+    with pd.ExcelFile(r'C:\Users\majaa\OneDrive\Documents\MajorProject-main\Data\sheets\data.xlsx') as reader:
+        sheet = pd.read_excel(reader, sheet_name = 'data')
     data = sheet.to_numpy() #convert to np array
+
     #strip the values to horizontal and vertical to individual lists
+    np.array(data[2], dtype=int)
+    data[2]=np.array(data[2], dtype=np.int)
+
+    new_array = data[:,2].tolist()
+
+    np.ascontiguousarray(new_array)
+
+    #[int(new_array) for new_array in new_array]
+    #print(type(new_array))
+    #print(new_array)
+
     for i in data:
         hr.append(i[0])
         vr.append(i[1])
 
+    for i in range(len(new_array)):
+        y_axis[int(new_array[i])]+=1
+
     #lists are ready
     #print(hr)
     #print(vr)
-    wb = xls.Workbook('hrvr_table_processed.xls',{'nan_inf_to_errors': True})
+    
+    print(y_axis)
+    wb = xls.Workbook(r'hrvr_table_processed.xls',{'nan_inf_to_errors': True})
     sheet = wb.add_worksheet('hrvr_table')
     frames = 1
     average_hr = 0
@@ -69,7 +89,10 @@ def _process_sheet():
     if(frames > 40):
         average_hr = sum_hr / (frames - (nan_s)) 
         average_vr = sum_hr / (frames - (nan_s)) 
+        print(average_hr)
         sheet.write(row_counter,c3,average_hr)
         sheet.write(row_counter,c4,average_vr)
-
+    plt.plot(x_axis,y_axis)
+    plt.show()
     wb.close()
+_process_sheet()

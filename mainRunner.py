@@ -1,4 +1,5 @@
 #all imports 
+from os import getpid
 from keras.models import load_model
 from time import sleep
 from keras.preprocessing.image import img_to_array
@@ -29,12 +30,12 @@ def get_number(label):
 webcam = cv2.VideoCapture(0) #open the camera
 
 gaze = GazeTracking() #gaze tracking object
-cascade_classifier=cv2.CascadeClassifier(r'C:\Users\Anand\Desktop\MajorProject\EmotionRecognition\frontalface.xml') #model to search for face in an image
-model=load_model(r'C:\Users\Anand\Desktop\MajorProject\EmotionRecognition\face.hdf5') #emotion detection model
+cascade_classifier=cv2.CascadeClassifier(r'C:\Users\Saptarushi\OneDrive\Desktop\MajorProject\EmotionRecognition\frontalface.xml') #model to search for face in an image
+model=load_model(r'C:\Users\Saptarushi\OneDrive\Desktop\MajorProject\EmotionRecognition\face.hdf5') #emotion detection model
 class_labels=['Angry','Disgust','Fear','Happy','Neutral','Sad','Surprise'] #classes of the emotions
 
 #create an excel sheet to write write data
-book = xlsxwriter.Workbook('C:\Users\Anand\Desktop\MajorProject\Data\sheets\data.xlsx')     
+book = xlsxwriter.Workbook(r'C:\Users\Saptarushi\OneDrive\Desktop\MajorProject\Data\sheets\data.xlsx')     
 sheet = book.add_worksheet('data')
 row = 0    
 column = 0   
@@ -70,30 +71,34 @@ while (TT > 0):
             preds = model.predict(roi)[0] #do the prediction
             label=class_labels[preds.argmax()] #get the label
             label_position = (x,y)  #make a tuple of the coordinates where the face begins
-            cv2.putText(frame,label,label_position,cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,255),3) #print stuff on the frame
 
             #Gaze Tracking part
             gaze.refresh(frame) #give the source image to the gaze tracking object
-            #frame = gaze.annotated_frame() #set the markings on the pupils
+            frame = gaze.annotated_frame() #set the markings on the pupils
             hr=gaze.horizontal_ratio()
             vr=gaze.vertical_ratio()
-            label_position = (x-2,y-50)
+            #label_position = (x-2,y-50)
             label = get_number(label)
             l=[]  
             l.append(hr)
             l.append(vr)
+            l.append(get_number(class_labels[preds.argmax()]))
             l.append(preds.argmax())
+            l.append(class_labels[preds.argmax()] )
+            column = 0
             for x in l:
                 print()
                 sheet.write(row, column+1, x)
                 column+=1
-            row += 1
-            column=0
+            
             cv2.imshow("Demo", frame)
-            cv2.imwrite('C:\Users\Anand\Desktop\MajorProject\Data\Images\kang'+str(i)+'.jpg',crop)
-            sheet.insert_image(row,column,'kang'+str(i)+'.jpg')            
+            cv2.imwrite(r'C:\Users\Saptarushi\OneDrive\Desktop\MajorProject\Data\Images\kang'+str(i)+'.jpg',crop) #print the image into images folder
+            sheet.insert_image(row,column,r'C:\Users\Saptarushi\OneDrive\Desktop\MajorProject\Data\Images\kang'+str(i)+'.jpg')
+            
+            print("image " + str(i) + "cap")
+            
+            row += 1          
             i+=1
-        break
     time.sleep(sleep_time) #sleeps till the amount of time specified in 'sleep_time' variable
     TT = TT -1 #reduce the number of frames captured
 book.close()
