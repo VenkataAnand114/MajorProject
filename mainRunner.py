@@ -85,7 +85,7 @@ while (TT > 0):
             l.append(preds.argmax())
             for x in l:
                 print()
-                sheet.write(row, column, x)
+                sheet.write(row, column+1, x)
                 column+=1
             row += 1
             column=0
