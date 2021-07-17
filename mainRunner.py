@@ -29,20 +29,24 @@ def get_number(label):
         return 0
 
 webcam = cv2.VideoCapture(0) #open the camera
+print("opened camera")
 
 gaze = GazeTracking() #gaze tracking object
+print("gaze tracking object created")
 cascade_classifier=cv2.CascadeClassifier(r'C:\Users\Saptarushi\OneDrive\Desktop\sai anna\MajorProject\EmotionRecognition\frontalface.xml') #model to search for face in an image
 model=load_model(r'C:\Users\Saptarushi\OneDrive\Desktop\sai anna\MajorProject\EmotionRecognition\face.hdf5') #emotion detection model
+print("emotion detection model loaded")
 class_labels=['Angry','Disgust','Fear','Happy','Neutral','Sad','Surprise'] #classes of the emotions
 
 #create an excel sheet to write write data
 book = xlsxwriter.Workbook(r'C:\Users\Saptarushi\OneDrive\Desktop\sai anna\MajorProject\Data\sheets\data.xlsx')     
 sheet = book.add_worksheet('data')
+print("excel sheet open now")
 row = 0    
 column = 0   
 
 #Time information variables
-TT =120 #runs for 1200 frames
+TT =240 #runs for TT frames , 1 minute = 120 frames
 sleep_time = 0.499 #sleeps for 0.499 ~ 0.5 secs, so runs at 2fps
 t=0
 
