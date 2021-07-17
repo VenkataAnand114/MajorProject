@@ -72,3 +72,13 @@ For running the same code on the nvidia jetson nano use the following steps:
 	pip install cmake
 5.Now install the dlib library with the line
 	pip install dlib
+
+
+------------------------------------------ List of files and functionality
+1) mainRunner.py 
+:		this file is used for inference, this program will monitor the person and record information in 
+			Data/sheets/data.xls
+2) reportGenerator:
+		this file will read the data.xls file and generate hrvr_table_processed.xls, this will have the frame by frame report 
+		of the data collected.
+		Data_40.xls ,is the file containing information recorded efor 40 minutes.
