@@ -21,7 +21,7 @@ def get_number(label):
     else:
         return 0
 def _process_sheet():
-    standard_frames = 300
+    standard_frames = 30
     #column numbers
     c0 = 0
     c1 = 1
@@ -38,7 +38,7 @@ def _process_sheet():
     x_axis = [0,1,2,3,4,5,6]
     emo = []
     #read the excel sheet as a data frame
-    with pd.ExcelFile(r'C:\Users\majaa\OneDrive\Documents\MajorProject-main\Data\sheets\data.xlsx') as reader:
+    with pd.ExcelFile(r'C:\Users\Saptarushi\OneDrive\Desktop\sai anna\MajorProject\Data\sheets\data.xlsx') as reader:
         sheet = pd.read_excel(reader, sheet_name = 'data')
     data = sheet.to_numpy() #convert to np array
     #strip the values to horizontal and vertical to individual lists
@@ -101,7 +101,7 @@ def _process_sheet():
                     sheet.write(row_counter,6,"Not Attentive")
                     print(average_vr)
                 sheet.write(row_counter,c3,average_hr)
-                sheet.write(row_counter,c4,average_vr)
+                #sheet.write(row_counter,c4,average_vr)
                 sheet.write(row_counter,7,average_emo)
                 #print(sum_hr)
                 #print(sum_vr)
@@ -130,8 +130,8 @@ def _process_sheet():
         average_vr = sum_hr / (frames - (nan_s)) 
         print(average_hr)
         sheet.write(row_counter,c3,average_hr)
-        sheet.write(row_counter,c4,average_vr)
-    plt.plot(x_axis,y_axis)
-    plt.show()
+        #sheet.write(row_counter,c4,average_vr)
+    #plt.plot(x_axis,y_axis)
+    #plt.show()
     wb.close()
 _process_sheet()

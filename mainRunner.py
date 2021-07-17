@@ -31,18 +31,18 @@ def get_number(label):
 webcam = cv2.VideoCapture(0) #open the camera
 
 gaze = GazeTracking() #gaze tracking object
-cascade_classifier=cv2.CascadeClassifier(r'Data\EmotionRecognition\frontalface.xml') #model to search for face in an image
-model=load_model(r'Data\EmotionRecognition\face.hdf5') #emotion detection model
+cascade_classifier=cv2.CascadeClassifier(r'C:\Users\Saptarushi\OneDrive\Desktop\sai anna\MajorProject\EmotionRecognition\frontalface.xml') #model to search for face in an image
+model=load_model(r'C:\Users\Saptarushi\OneDrive\Desktop\sai anna\MajorProject\EmotionRecognition\face.hdf5') #emotion detection model
 class_labels=['Angry','Disgust','Fear','Happy','Neutral','Sad','Surprise'] #classes of the emotions
 
 #create an excel sheet to write write data
-book = xlsxwriter.Workbook(r'\Data\sheets\data.xlsx')     
+book = xlsxwriter.Workbook(r'C:\Users\Saptarushi\OneDrive\Desktop\sai anna\MajorProject\Data\sheets\data.xlsx')     
 sheet = book.add_worksheet('data')
 row = 0    
 column = 0   
 
 #Time information variables
-TT =240 #runs for 1200 frames
+TT =120 #runs for 1200 frames
 sleep_time = 0.499 #sleeps for 0.499 ~ 0.5 secs, so runs at 2fps
 t=0
 
@@ -86,14 +86,14 @@ while (TT > 0):
             l.append(vr)
             l.append(preds.argmax())
             for x in l:
-                print()
+                #print()
                 sheet.write(row, column, x)
                 column+=1
             row += 1
             column=0
             cv2.imshow("Demo", frame)
-            cv2.imwrite(r'Data\Images\kang'+str(i)+'.jpg',crop)
-            sheet.insert_image(row-1,3,r'\Data\Images\kang'+str(i)+'.jpg')            
+            cv2.imwrite(r'C:\Users\Saptarushi\OneDrive\Desktop\sai anna\MajorProject\Data\Images\kang'+str(i)+'.jpg',crop)
+            sheet.insert_image(row-1,3,r'C:\Users\Saptarushi\OneDrive\Desktop\sai anna\MajorProject\Data\Images\kang'+str(i)+'.jpg')            
             i+=1
     if cv2.waitKey(1) == 27:
         break
